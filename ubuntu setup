@@ -13,3 +13,9 @@ sudo chmod -R 775 ~/appdata /mnt/storage
 Copy this docker-compose.yaml into ~/stack-media/compose.yaml:
 mkdir -p ~/stack-media
 nano ~/stack-media/compose.yaml  # paste the YAML content
+
+Start the stack:
+cd ~/stack-media
+docker-compose up -d
+docker ps
+docker-compose logs -f
