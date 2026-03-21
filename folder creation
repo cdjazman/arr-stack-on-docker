@@ -1,0 +1,16 @@
+Cree AppData & Media Folders
+mkdir -p ~/appdata/radarr \
+         ~/appdata/sonarr \
+         ~/appdata/sabnzbd \
+         ~/appdata/prowlarr \
+         ~/appdata/bazarr \
+         /mnt/storage/downloads \
+         /mnt/storage/movies \
+         /mnt/storage/tv
+5️⃣ Set Permissions
+
+Assuming your Docker containers run as PUID=1000 / PGID=1000 (your user craig):
+
+sudo chown -R craig:craig ~/appdata
+sudo chown -R craig:craig /mnt/storage
+sudo chmod -R 775 ~/appdata /mnt/storage
