@@ -1,0 +1,83 @@
+services:
+  radarr:
+    image: ghcr.io/hotio/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+      - "7878:7878"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/simon/appdata/radarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  sonarr:
+    image: ghcr.io/hotio/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/simon/appdata/sonarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/simon/appdata/sabnzbd:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    ports:
+      - "9696:9696"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/simon/appdata/prowlarr:/config
+    networks:
+      - media_stack_network
+
+  bazarr:
+    image: ghcr.io/hotio/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    ports:
+      - "6767:6767"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/simon/appdata/bazarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+networks:
+  media_stack_network:
+    name: media_stack_network
