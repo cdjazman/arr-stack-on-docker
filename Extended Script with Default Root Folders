@@ -35,8 +35,28 @@ echo "=== Home directory: $HOME_DIR ==="
 echo "=== Updating system ==="
 sudo apt update && sudo apt upgrade -y
 
-echo "=== Installing Docker and Docker Compose ==="
-sudo apt install -y docker.io docker compose
+echo "=== Installing Docker (official repo) ==="
+
+# Install prerequisites
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+# Add Docker GPG key
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# Add Docker repo
+echo "deb [arch=$(dpkg --print-architecture) \
+signed-by=/etc/apt/keyrings/docker.gpg] \
+https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker + Compose plugin
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Enable Docker
 sudo systemctl enable --now docker
 
 echo "=== Creating config folders ==="
@@ -159,13 +179,13 @@ echo '{"path":"/data/movies","label":"Movies"}' > "$HOME_DIR/appdata/radarr/root
 mkdir -p "$HOME_DIR/appdata/sonarr/rootfolders/tv"
 echo '{"path":"/data/tv","label":"TV"}' > "$HOME_DIR/appdata/sonarr/rootfolders.json"
 
-# SABnzbd download folders
+# SABnzbd folders
 mkdir -p "$HOME_DIR/appdata/sabnzbd/incomplete" "$HOME_DIR/appdata/sabnzbd/complete"
 echo '{"categories":{"tv":{"path":"/data/tv"},"movies":{"path":"/data/movies"}}}' > "$HOME_DIR/appdata/sabnzbd/folders.json"
 
-echo "=== Done! Stack is running with default root folders configured ==="
-echo "Access Radarr: http://localhost:7878"
-echo "Access Sonarr: http://localhost:8989"
-echo "Access SABnzbd: http://localhost:8080"
-echo "Access Prowlarr: http://localhost:9696"
-echo "Access Bazarr: http://localhost:6767"
+echo "=== Done! Stack is running ==="
+echo "Radarr:  http://localhost:7878"
+echo "Sonarr:  http://localhost:8989"
+echo "SABnzbd: http://localhost:8080"
+echo "Prowlarr: http://localhost:9696"
+echo "Bazarr:  http://localhost:6767"
