@@ -1,0 +1,171 @@
+Extended Script with Default Root Folders
+
+How to use:
+Save the script:
+_________________________________________________________
+nano ~/setup-media-stack-portable.sh
+# Paste the content above, save and exit
+_________________________________________________________
+Make it executable:
+chmod +x ~/setup-media-stack-portable.sh
+_________________________________________________________
+Run it:
+./setup-media-stack-portable.sh
+_________________________________________________________
+Verify containers and logs:
+docker ps
+docker-compose logs -f
+
+
+
+_________________________________________________________________________________________________________
+
+#!/bin/bash
+# setup-media-stack-auto-roots.sh
+# Full media stack setup with automatic Radarr/Sonarr/SABnzbd root folders
+
+set -e
+
+USER_NAME=$(whoami)
+HOME_DIR=$(eval echo "~$USER_NAME")
+
+echo "=== User detected: $USER_NAME ==="
+echo "=== Home directory: $HOME_DIR ==="
+
+echo "=== Updating system ==="
+sudo apt update && sudo apt upgrade -y
+
+echo "=== Installing Docker and Docker Compose ==="
+sudo apt install -y docker.io docker-compose
+sudo systemctl enable --now docker
+
+echo "=== Creating config folders ==="
+mkdir -p "$HOME_DIR/appdata/radarr" \
+         "$HOME_DIR/appdata/sonarr" \
+         "$HOME_DIR/appdata/sabnzbd" \
+         "$HOME_DIR/appdata/prowlarr" \
+         "$HOME_DIR/appdata/bazarr"
+
+echo "=== Creating media folders ==="
+sudo mkdir -p /mnt/storage/downloads /mnt/storage/movies /mnt/storage/tv
+sudo chown -R "$USER_NAME:$USER_NAME" "$HOME_DIR/appdata" /mnt/storage
+sudo chmod -R 775 "$HOME_DIR/appdata" /mnt/storage
+
+echo "=== Creating stack folder and docker-compose.yaml ==="
+mkdir -p "$HOME_DIR/stack-media"
+
+cat > "$HOME_DIR/stack-media/compose.yaml" <<EOF
+version: "3.9"
+
+services:
+  radarr:
+    image: ghcr.io/hotio/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+      - "7878:7878"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - $HOME_DIR/appdata/radarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  sonarr:
+    image: ghcr.io/hotio/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - $HOME_DIR/appdata/sonarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - $HOME_DIR/appdata/sabnzbd:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    ports:
+      - "9696:9696"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - $HOME_DIR/appdata/prowlarr:/config
+    networks:
+      - media_stack_network
+
+  bazarr:
+    image: ghcr.io/hotio/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    ports:
+      - "6767:6767"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - $HOME_DIR/appdata/bazarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+networks:
+  media_stack_network:
+    name: media_stack_network
+EOF
+
+echo "=== Starting the stack ==="
+cd "$HOME_DIR/stack-media"
+docker-compose up -d
+
+echo "=== Waiting 20 seconds for containers to initialize ==="
+sleep 20
+
+echo "=== Creating default root folders inside config ==="
+
+# Radarr root
+mkdir -p "$HOME_DIR/appdata/radarr/rootfolders/movies"
+echo '{"path":"/data/movies","label":"Movies"}' > "$HOME_DIR/appdata/radarr/rootfolders.json"
+
+# Sonarr root
+mkdir -p "$HOME_DIR/appdata/sonarr/rootfolders/tv"
+echo '{"path":"/data/tv","label":"TV"}' > "$HOME_DIR/appdata/sonarr/rootfolders.json"
+
+# SABnzbd download folders
+mkdir -p "$HOME_DIR/appdata/sabnzbd/incomplete" "$HOME_DIR/appdata/sabnzbd/complete"
+echo '{"categories":{"tv":{"path":"/data/tv"},"movies":{"path":"/data/movies"}}}' > "$HOME_DIR/appdata/sabnzbd/folders.json"
+
+echo "=== Done! Stack is running with default root folders configured ==="
+echo "Access Radarr: http://localhost:7878"
+echo "Access Sonarr: http://localhost:8989"
+echo "Access SABnzbd: http://localhost:8080"
+echo "Access Prowlarr: http://localhost:9696"
+echo "Access Bazarr: http://localhost:6767"
