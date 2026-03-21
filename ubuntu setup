@@ -1,0 +1,15 @@
+How to set this up on a fresh Ubuntu VM
+Install Docker & Docker Compose:
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo systemctl enable --now docker
+Create config folders:
+mkdir -p ~/appdata/radarr ~/appdata/sonarr ~/appdata/sabnzbd \
+         ~/appdata/prowlarr ~/appdata/bazarr
+Ensure media folders exist and have correct permissions:
+mkdir -p /mnt/storage/downloads /mnt/storage/movies /mnt/storage/tv
+sudo chown -R craig:craig ~/appdata /mnt/storage
+sudo chmod -R 775 ~/appdata /mnt/storage
+Copy this docker-compose.yaml into ~/stack-media/compose.yaml:
+mkdir -p ~/stack-media
+nano ~/stack-media/compose.yaml  # paste the YAML content
