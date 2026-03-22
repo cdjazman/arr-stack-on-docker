@@ -1,0 +1,112 @@
+services:
+  radarr:
+    image: ghcr.io/hotio/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+      - "7878:7878"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/appdata/radarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  sonarr:
+    image: ghcr.io/hotio/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/appdata/sonarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/appdata/sabnzbd:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    ports:
+      - "9696:9696"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/appdata/prowlarr:/config
+    networks:
+      - media_stack_network
+
+  bazarr:
+    image: ghcr.io/hotio/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    ports:
+      - "6767:6767"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/appdata/bazarr:/config
+      - /mnt/storage:/data
+    networks:
+      - media_stack_network
+
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+      - "7575:7575"
+    environment:
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/appdata/homarr:/app/data
+    networks:
+      - media_stack_network
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    init: true
+    restart: unless-stopped
+    ports:
+      - "5055:5055"
+    volumes:
+      - /home/craig/appdata/seerr:/app/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Australia/Melbourne
+    networks:
+      - media_stack_network
+
+networks:
+  media_stack_network:
+    name: media_stack_network
