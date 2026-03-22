@@ -1,0 +1,56 @@
+sudo apt update && sudo apt upgrade -y
+
+sudo apt install cifs-utils -y
+
+
+# Rufus NAS
+sudo nano /root/.rufus74
+# Contents:
+username=craig
+password=jazman01
+sudo chmod 600 /root/.rufus74
+
+
+# Nigel NAS
+sudo nano /root/.nigel75
+# Contents:
+username=admin
+password=jazman01
+sudo chmod 600 /root/.nigel75
+
+
+sudo mkdir -p /mnt/storage/movies
+sudo mkdir -p /mnt/storage/tv
+sudo mkdir -p /mnt/storage/downloads
+sudo chown -R 1000:1000 /mnt/storage
+sudo chmod -R 0777 /mnt/storage
+
+
+
+# ===============================================
+# NAS Mounts for Ubuntu VM — Auto-reconnect enabled
+# ===============================================
+
+# Rufus NAS → Movies
+//192.168.5.74/movies /mnt/storage/movies cifs credentials=/root/.rufus74,uid=1000,gid=1000,file_mode=0777,dir_mode=0777,vers=2.0,iocharset=utf8,_netdev,nofail 0 0
+
+# Nigel NAS → TV
+//192.168.5.75/media/tv /mnt/storage/tv cifs credentials=/root/.nigel75,uid=1000,gid=1000,file_mode=0777,dir_mode=0777,vers=2.0,iocharset=utf8,_netdev,nofail 0 0
+
+# Nigel NAS → Downloads
+//192.168.5.75/data/downloads /mnt/storage/downloads cifs credentials=/root/.nigel75,uid=1000,gid=1000,file_mode=0777,dir_mode=0777,vers=2.0,iocharset=utf8,_netdev,nofail 0 0
+
+# Add Docker’s GPG key and repo
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+  | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+
+
+# Install Docker
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+# Add your user to the docker group (optional, avoids sudo)
+sudo usermod -aG docker $USER
