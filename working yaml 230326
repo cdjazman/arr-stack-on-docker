@@ -78,19 +78,6 @@ services:
     networks:
       - media_stack_network
 
-  homarr:
-    image: ghcr.io/ajnart/homarr:latest
-    container_name: homarr
-    restart: unless-stopped
-    ports:
-      - "7575:7575"
-    environment:
-      TZ: Australia/Melbourne
-    volumes:
-      - /home/craig/appdata/homarr:/app/data
-    networks:
-      - media_stack_network
-
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     container_name: seerr
@@ -104,6 +91,20 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Australia/Melbourne
+    networks:
+      - media_stack_network
+
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: unless-stopped
+    ports:
+      - "7575:7575"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # Optional Docker integration
+      - /home/craig/appdata/homarr:/appdata         # Persistent data volume
+    environment:
+      SECRET_ENCRYPTION_KEY: f76b4f54050ddb98023f338e2d39a03bc3d06ac9155157738a3e0bd44b389b46
     networks:
       - media_stack_network
 
