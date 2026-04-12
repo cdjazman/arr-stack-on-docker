@@ -1,0 +1,141 @@
+services:
+
+#  plex:
+#    image: lscr.io/linuxserver/plex:latest
+#    container_name: plex
+#    network_mode: host
+#    restart: unless-stopped
+#    environment:
+#      PUID: 1000
+#      PGID: 1000
+#      TZ: Australia/Melbourne
+#      VERSION: docker
+#    volumes:
+#      - /home/craig/docker/plex:/config
+#      - /data:/data
+#    devices:
+#      - /dev/dri:/dev/dri
+
+  radarr:
+    image: ghcr.io/hotio/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+      - "7878:7878"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/docker/radarr:/config
+      - /data:/data
+    networks:
+      - media_stack_network
+
+  sonarr:
+    image: ghcr.io/hotio/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/docker/sonarr:/config
+      - /data:/data
+    networks:
+      - media_stack_network
+
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/docker/sabnzbd:/config
+      - /data:/data
+    networks:
+      - media_stack_network
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    ports:
+      - "9696:9696"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/docker/prowlarr:/config
+    networks:
+      - media_stack_network
+
+  profilarr:
+    image: santiagosayshey/profilarr:latest
+    container_name: profilarr
+    restart: unless-stopped
+    ports:
+      - "6868:6868"
+    environment:
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/docker/profilarr:/config
+    networks:
+      - media_stack_network
+
+  bazarr:
+    image: ghcr.io/hotio/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    ports:
+      - "6767:6767"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/docker/bazarr:/config
+      - /data:/data
+    networks:
+      - media_stack_network
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    restart: unless-stopped
+    ports:
+      - "5055:5055"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Melbourne
+    volumes:
+      - /home/craig/docker/seerr:/app/config
+    networks:
+      - media_stack_network
+
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+      - "7575:7575"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/craig/docker/homarr:/appdata
+    environment:
+      SECRET_ENCRYPTION_KEY: f76b4f54050ddb98023f338e2d39a03bc3d06ac9155157738a3e0bd44b389b46
+    networks:
+      - media_stack_network
+
+networks:
+  media_stack_network:
